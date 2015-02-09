@@ -1,6 +1,6 @@
-# bitcoin-testnet-box
+# bitcoin-dev-box
 
-This is a private, bitcoin, testnet-in-a-box.
+This is a private, bitcoin, testnet-in-a-box. It's a fork of **freewil/bitcoin-testnet-box** that also allows you to build `bitcoind` and `bitcoin-cli` from source.
 
 You must have `bitcoind` and `bitcoin-cli` installed on your system and in the
 path unless running this within a [Docker](https://www.docker.io) container
@@ -70,10 +70,7 @@ bitcoin-cli -datadir=2  getinfo
 
 ## Generating blocks
 
-Normally on the live, real, bitcoin network, blocks are generated, on average,
-every 10 minutes. Since this testnet-in-box uses Bitcoin Core's (bitcoind)
-regtest mode, we are able to generate a block on a private network
-instantly using a simple command.
+Normally on the live, real, bitcoin network, blocks are generated, on average, every 10 minutes. Since this testnet-in-box uses Bitcoin Core's (bitcoind) regtest mode, we are able to generate a block on a private network instantly using a simple command.
 
 To generate a block:
 
@@ -87,6 +84,12 @@ To generate more than 1 block:
 $ make generate BLOCKS=10
 ```
 
+In order to create a balance that you can send to another address, you need to generate at least 100 blocks:
+
+```
+$ make generate BLOCKS=100
+```
+
 ## Sending bitcoins
 To send bitcoins that you've generated:
 
@@ -95,10 +98,7 @@ $ make send ADDRESS=mxwPtt399zVrR62ebkTWL4zbnV1ASdZBQr AMOUNT=10
 ```
 
 ## Sending bitcoins back to node 1
-After sending bitcoins (generated on node 1) to node 2, send them
-back to node 1. In order to do so you will need to get a new address
-for node 1. You can optionally specify an account on node 1 to associate
-the address with.
+After sending bitcoins (generated on node 1) to node 2, send them back to node 1. In order to do so you will need to get a new address for node 1. You can optionally specify an account on node 1 to associate the address with.
 
 ```
 $ make address ACCOUNT=testwithdrawals
@@ -118,21 +118,24 @@ $ make clean
 ```
 
 ## Using with docker
-This testnet-box can be used with [docker](https://www.docker.io/) to run it in
-an isolated container.
+This testnet-box can be used with [docker](https://www.docker.io/) to run it in an isolated container.
 
 ### Building docker image
 
-Pull the image
-  * `docker pull freewil/bitcoin-testnet-box`
+Either pull the image:
 
-or build it yourself from this directory
-  * `docker build -t bitcoin-testnet-box .`
+```
+docker pull c0achmcguirk/bitcoin-testnet-box
+```
+
+...or build it yourself from this directory:
+
+```
+docker build -t bitcoin-testnet-box .
+```
 
 ### Running docker container
-The docker image will run two bitcoin nodes in the background and is meant to be
-attached to allow you to type in commands. The image also exposes
-the two JSON-RPC ports from the nodes if you want to be able to access them
-from outside the container.
 
-* `$ docker run -t -i freewil/bitcoin-testnet-box`
+The docker image will run two bitcoin nodes in the background and is meant to be attached to allow you to type in commands. The image also exposes the two JSON-RPC ports from the nodes if you want to be able to access them from outside the container.
+
+* `$ docker run -ti c0achmcguirk/bitcoin-testnet-box`

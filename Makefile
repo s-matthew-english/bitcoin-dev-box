@@ -1,3 +1,5 @@
+.PHONY: clean start stop build
+
 BITCOIND=bitcoind
 BITCOINGUI=bitcoin-qt
 BITCOINCLI=bitcoin-cli
@@ -9,6 +11,8 @@ BLOCKS=1
 ADDRESS=
 AMOUNT=
 ACCOUNT=
+BITCOIN_SRC_DIR=/home/tester/bitcoin/src
+DB4_LIB_DIR=/home/tester/bitcoin/db4
 
 start:
 	$(BITCOIND) $(B1) -daemon
@@ -34,6 +38,11 @@ address:
 stop:
 	$(BITCOINCLI) $(B1) stop
 	$(BITCOINCLI) $(B2) stop
+
+build-bitcoin:
+	cd $(BITCOIN_SRC_DIR)/.. && ./autogen.sh && ./configure LDFLAGS="-L$(DB4_LIB_DIR)/lib" CPPFLAGS="-I$(DB4_LIB_DIR)/include" && make && sudo make install
+
+build: | stop build-bitcoin start
 
 clean:
 	find 1/regtest/* -not -name 'server.*' -delete
