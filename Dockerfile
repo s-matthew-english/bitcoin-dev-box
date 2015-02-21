@@ -1,7 +1,14 @@
 # bitcoin-testnet-box docker image
 
-FROM ubuntu:12.04
+# Use phusion/baseimage as base image. To make your builds reproducible, make
+# sure you lock down to a specific version, not to `latest`!
+# See https://github.com/phusion/baseimage-docker/blob/master/Changelog.md for
+# a list of version numbers.
+FROM phusion/baseimage:0.9.16
 MAINTAINER Paul Oliver <paul@paultastic.com>
+
+# Use baseimage-docker's init system.
+CMD ["/sbin/my_init"]
 
 # add bitcoind from the official PPA
 RUN apt-get update
@@ -55,6 +62,10 @@ RUN rm -rf db-4.8.30.NC.tar.gz
 # run commands from inside the testnet-box directory
 WORKDIR /home/tester/bitcoin-testnet-box
 
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 # expose two rpc ports for the nodes to allow outside container access
 EXPOSE 19001 19011
 CMD ["/bin/bash"]
+
