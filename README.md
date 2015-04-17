@@ -1,12 +1,18 @@
 # bitcoin-dev-box
 
+**Have you ever wanted to experiment with modifying the bitcoin source code?**
+
+This is *the perfect* way to dip your toes into bitcoin development.
+
+**I highly recommend running this inside a docker container.**
+
 This is a private, bitcoin, testnet-in-a-box. It's a fork of **freewil/bitcoin-testnet-box** that also allows you to build `bitcoind` and `bitcoin-cli` from source.
 
 You must have `bitcoind` and `bitcoin-cli` installed on your system and in the
 path unless running this within a [Docker](https://www.docker.io) container
 (see [below](#using-with-docker)).
 
-[![docker stats](http://dockeri.co/image/freewil/bitcoin-testnet-box)](https://registry.hub.docker.com/u/freewil/bitcoin-testnet-box/)
+[![docker stats](http://dockeri.co/image/poliver/bitcoin-dev-box)](https://registry.hub.docker.com/u/poliver/bitcoin-dev-box/)
 
 ## Starting the testnet-box
 
@@ -117,6 +123,17 @@ original state:
 $ make clean
 ```
 
+## Modify bitcoin source code
+
+Another cool feature of this docker container is it comes pre-loaded with the bitcoin source code. I've taken the time to install all the libraries bitcoin needs to be built. So you can modify the bitcoin source code, compile it, and the run your local testnet to see if your changes work. Here's how you can do that:
+
+1. `cd ~/testnet/src`
+1. Use an editor (vim comes installed on this container) to modify the source code
+1. `cd ~/testnet/`
+1. `make build` (this command stops bitcoind, rebuilds bitcoin, and then runs bitcoind again)
+
+**Note: it will ask you the password for the `tester` user because it needs to use `sudo`. The password is `tester`.**
+
 ## Using with docker
 This testnet-box can be used with [docker](https://www.docker.io/) to run it in an isolated container.
 
@@ -125,7 +142,7 @@ This testnet-box can be used with [docker](https://www.docker.io/) to run it in 
 Either pull the image:
 
 ```
-docker pull c0achmcguirk/bitcoin-dev-box
+docker pull poliver/bitcoin-dev-box
 ```
 
 ...or build it yourself from this directory:
@@ -138,4 +155,4 @@ docker build -t bitcoin-dev-box .
 
 The docker image will run two bitcoin nodes in the background and is meant to be attached to allow you to type in commands. The image also exposes the two JSON-RPC ports from the nodes if you want to be able to access them from outside the container.
 
-* `$ docker run -ti c0achmcguirk/bitcoin-dev-box`
+* `$ docker run -ti poliver/bitcoin-dev-box`
