@@ -1,7 +1,6 @@
 .PHONY: clean start stop build
 
 BITCOIND=bitcoind
-BITCOINGUI=bitcoin-qt
 BITCOINCLI=bitcoin-cli
 B1_FLAGS=
 B2_FLAGS=
@@ -18,10 +17,6 @@ start:
 	$(BITCOIND) $(B1) -daemon
 	$(BITCOIND) $(B2) -daemon
 
-start-gui:
-	$(BITCOINGUI) $(B1) &
-	$(BITCOINGUI) $(B2) &
-
 generate:
 	$(BITCOINCLI) $(B1) setgenerate true $(BLOCKS)
 
@@ -32,8 +27,14 @@ getinfo:
 send:
 	$(BITCOINCLI) $(B1) sendtoaddress $(ADDRESS) $(AMOUNT)
 
+send:
+	$(BITCOINCLI) $(B2) sendtoaddress $(ADDRESS) $(AMOUNT)
+
 address:
 	$(BITCOINCLI) $(B1) getnewaddress $(ACCOUNT)
+
+address2:
+	$(BITCOINCLI) $(B2) getnewaddress $(ACCOUNT)
 
 stop:
 	$(BITCOINCLI) $(B1) stop
@@ -42,7 +43,7 @@ stop:
 build-bitcoin:
 	cd $(BITCOIN_SRC_DIR)/.. && ./autogen.sh && ./configure LDFLAGS="-L$(DB4_LIB_DIR)/lib" CPPFLAGS="-I$(DB4_LIB_DIR)/include" && make && sudo make install
 
-build: | stop build-bitcoin start
+build: | stop build-bitcoin clean start
 
 clean:
 	find 1/regtest/* -not -name 'server.*' -delete
