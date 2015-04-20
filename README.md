@@ -14,6 +14,12 @@ path unless running this within a [Docker](https://www.docker.io) container
 
 [![docker stats](http://dockeri.co/image/poliver/bitcoin-dev-box)](https://registry.hub.docker.com/u/poliver/bitcoin-dev-box/)
 
+### Running docker container
+
+The docker image will run two bitcoin nodes in the background and is meant to be attached to allow you to type in commands. The image also exposes the two JSON-RPC ports from the nodes if you want to be able to access them from outside the container.
+
+* `$ docker run -ti --name btcdev -P -p 49020:19000 poliver/bitcoin-dev-box`
+
 ## Starting the testnet-box
 
 This will start up two nodes using the two datadirs `1` and `2`. They
@@ -26,7 +32,6 @@ Node `1` will listen on port `19000`, allowing node `2` to connect to it.
 
 Node `1` will listen on port `19001` and node `2` will listen on port `19011`
 for the JSON-RPC server.
-
 
 ```
 $ make start
@@ -110,6 +115,18 @@ After sending bitcoins (generated on node 1) to node 2, send them back to node 1
 $ make address ACCOUNT=testwithdrawals
 ```
 
+## Sending bitcoins to node2
+
+You first generate an address for node2:
+
+```
+$ make address2
+bitcoin-cli -datadir=2  getnewaddress
+mtRipU3BueyarTRcWsKjKXgGsUWMdcWDzD
+```
+
+We see an address for node2 is `mtRipU3BueyarTRcWsKjKXgGsUWMdcWDzD`. You can use your bitcoin client to send bitcoin to the address or you can send it from node1 using `make send ADDRESS=mtRipU3BueyarTRcWsKjKXgGsUWMdcWDzD AMOUNT=1.5`.
+
 ## Stopping the testnet-box
 
 ```
@@ -122,6 +139,34 @@ original state:
 ```
 $ make clean
 ```
+
+## Connecting to your bitcoin regtest testnet using Bitcoin-QT
+
+You can use the [Bitcoin-QT](https://bitcoin.org/en/download) to connect to this docker container's bitcoin nodes. This is how you can do it on a Mac:
+
+```shell
+# Example on a Mac
+$ mkdir -p ~/localnet
+$ /Applications/Bitcoin-Qt.app/Contents/MacOS/Bitcoin-Qt \
+    -regtest -dnsseed=0 -connect=dockerhost:49020 \
+    -datadir=./localnet/
+
+# Example on Linux
+$ mkdir -p ~/localnet
+$ /path/to/bitcoin-qt \
+    -regtest -dnsseed=0 -connect=localhost:49020 \
+    -datadir=./localnet/
+
+# Example on Windows
+$ MKDIR $HOME\localnet
+$ "C:\Program Files\Bitcoin\bitcoin-qt.exe" \
+    -regtest -dnsseed=0 -connect=dockerhost:49020 \
+    -datadir=$HOME/localnet
+```
+
+This assumes you are using port `49020` when you remapped your ports using docker
+
+***Note to Mac or Windows Users**: `dockerhost` is typically `192.168.59.103`, but this can change based on your Oracle VirtualBox settings. You can always check for the IP address by running  `boot2docker ip` from the command line on Mac or Windows.*
 
 ## Modify bitcoin source code
 
@@ -151,8 +196,3 @@ docker pull poliver/bitcoin-dev-box
 docker build -t bitcoin-dev-box .
 ```
 
-### Running docker container
-
-The docker image will run two bitcoin nodes in the background and is meant to be attached to allow you to type in commands. The image also exposes the two JSON-RPC ports from the nodes if you want to be able to access them from outside the container.
-
-* `$ docker run -ti poliver/bitcoin-dev-box`

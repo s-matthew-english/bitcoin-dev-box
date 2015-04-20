@@ -27,7 +27,7 @@ getinfo:
 send:
 	$(BITCOINCLI) $(B1) sendtoaddress $(ADDRESS) $(AMOUNT)
 
-send:
+send2:
 	$(BITCOINCLI) $(B2) sendtoaddress $(ADDRESS) $(AMOUNT)
 
 address:
@@ -37,11 +37,13 @@ address2:
 	$(BITCOINCLI) $(B2) getnewaddress $(ACCOUNT)
 
 stop:
-	$(BITCOINCLI) $(B1) stop
-	$(BITCOINCLI) $(B2) stop
+	-$(BITCOINCLI) $(B1) stop
+	-$(BITCOINCLI) $(B2) stop
 
 build-bitcoin:
-	cd $(BITCOIN_SRC_DIR)/.. && ./autogen.sh && ./configure LDFLAGS="-L$(DB4_LIB_DIR)/lib" CPPFLAGS="-I$(DB4_LIB_DIR)/include" && make && sudo make install
+	cd $(BITCOIN_SRC_DIR)/.. && ./autogen.sh && ./configure LDFLAGS="-L$(DB4_LIB_DIR)/lib" CPPFLAGS="-I$(DB4_LIB_DIR)/include" && make
+	echo "**** Tester's password is 'tester' ****"
+	cd $(BITCOIN_SRC_DIR)/.. && sudo make install
 
 build: | stop build-bitcoin clean start
 

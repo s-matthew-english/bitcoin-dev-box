@@ -7,7 +7,7 @@
 FROM phusion/baseimage:0.9.16
 MAINTAINER Paul Oliver <dockerpaul@paultastic.com>
 
-ENV LAST_REFRESHED 20150418
+ENV LAST_REFRESHED 20150419
 ENV HOME /home/tester
 
 # Use baseimage-docker's init system.
@@ -21,11 +21,22 @@ RUN add-apt-repository --yes ppa:bitcoin/bitcoin
 # Yes, you need to run apt-get update again after adding the bitcoin ppa
 RUN apt-get update
 
-# install bitcoind (from PPA) and make
-RUN apt-get install --yes bitcoind make
-
-# Install libs required for building bitcoin
-RUN apt-get install --yes vim git gcc libboost-all-dev build-essential libtool autotools-dev autoconf pkg-config libssl-dev bsdmainutils sudo
+# install bitcoind (from PPA)
+RUN apt-get install --yes \
+  autoconf \ 
+  autotools-dev \ 
+  bitcoind \ 
+	bsdmainutils \ 
+	build-essential \ 
+	gcc \ 
+	git \ 
+	libboost-all-dev \ 
+	libssl-dev \ 
+	libtool \ 
+  make \
+	pkg-config \ 
+	sudo \
+  vim  
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -36,6 +47,11 @@ RUN echo 'root:abc123' |chpasswd
 # create a non-root user
 RUN useradd -d /home/tester -m -s /bin/bash tester && echo "tester:tester" | chpasswd && adduser tester sudo
 
+# download and extract berkeley db 4.8 for wallets
+WORKDIR /home/tester
+ADD http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz /home/tester/
+RUN tar -xzvf /home/tester/db-4.8.30.NC.tar.gz
+
 # copy testnet box files
 COPY Makefile /home/tester/testnet/
 COPY README.md /home/tester/testnet/
@@ -43,15 +59,10 @@ COPY ./1/ /home/tester/testnet/1/
 COPY ./2/ /home/tester/testnet/2/
 
 # set up some nice vim and vim colors for developer niceties
-ADD vim/.vimrc /home/tester/
+COPY vim/.vimrc /home/tester/
 
 # And the bitcoin binaries, of course
-ADD bin/* /usr/bin/
-
-# download and extract berkeley db 4.8 for wallets
-WORKDIR /home/tester
-ADD http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz /home/tester/
-RUN tar -xzvf /home/tester/db-4.8.30.NC.tar.gz
+COPY bin/* /usr/bin/
 
 # make tester user own the testnet
 RUN chown -R tester:tester /home/tester
