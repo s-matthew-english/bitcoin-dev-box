@@ -7,16 +7,16 @@
 FROM phusion/baseimage:0.9.16
 MAINTAINER Paul Oliver <dockerpaul@paultastic.com>
 
-ENV LAST_REFRESHED 20150419
+ENV LAST_REFRESHED 20150420
 ENV HOME /home/tester
 
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
 
 # add bitcoind from the official PPA
-RUN apt-get update
-RUN apt-get install --yes python-software-properties
-RUN add-apt-repository --yes ppa:bitcoin/bitcoin
+RUN apt-get update && \
+    apt-get install --yes python-software-properties && \
+    add-apt-repository --yes ppa:bitcoin/bitcoin
 
 # Yes, you need to run apt-get update again after adding the bitcoin ppa
 RUN apt-get update
@@ -52,14 +52,8 @@ WORKDIR /home/tester
 ADD http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz /home/tester/
 RUN tar -xzvf /home/tester/db-4.8.30.NC.tar.gz
 
-# copy testnet box files
-COPY Makefile /home/tester/testnet/
-COPY README.md /home/tester/testnet/
-COPY ./1/ /home/tester/testnet/1/
-COPY ./2/ /home/tester/testnet/2/
-
-# set up some nice vim and vim colors for developer niceties
-COPY vim/.vimrc /home/tester/
+# Copy files needed: Makefile, configs, vimrc file
+COPY ./hometester/ /home/tester/
 
 # And the bitcoin binaries, of course
 COPY bin/* /usr/bin/
